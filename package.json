@@ -1,0 +1,17 @@
+{
+	"name": "vdc",
+	"version": "0.1.1",
+	"author": "SheetJS",
+	"description": "van der Corput low-discrepancy sequences",
+	"keywords": [ "math", "random", "qrng", "lds" ],
+	"main": "./vdc",
+	"devDependencies": {
+		"mocha":""
+	},
+	"repository": { "type":"git", "url":"git://github.com/SheetJS/js-vdc.git" },
+	"scripts": {
+		"test": "make mocha"
+	},
+	"bugs": { "url": "https://github.com/SheetJS/js-vdc/issues" },
+	"license": "MIT"
+}
