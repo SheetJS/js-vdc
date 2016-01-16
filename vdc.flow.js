@@ -1,6 +1,13 @@
 /* vdc.js (C) 2013-present SheetJS -- http://sheetjs.com */
 /* vim: set ts=2: */
-function VDC (opts) {
+/*::
+type VDCArgs = {
+	b?: number,
+	n?: number
+};
+*/
+
+function VDC (opts/*:?VDCArgs*/) {
 	if(!(this instanceof VDC)) return new VDC(opts);
 	var o = opts || {b:2, n:0};
 	this._b = o.b || 2;
@@ -9,11 +16,11 @@ function VDC (opts) {
 	this.reset(o);
 }
 
-VDC.prototype.reset = function(opts) {
+VDC.prototype.reset = function(opts/*:?VDCArgs*/) {
 	this._n = (opts||{n:0}).n||0;
 };
 
-VDC.prototype.next = function() {
+VDC.prototype.next = function()/*:number*/ {
 	var n = this._n++;
 	var p = 0, q = 1;
 	while(n >= 1) {

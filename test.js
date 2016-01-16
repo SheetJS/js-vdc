@@ -12,8 +12,7 @@ describe('should reproduce baselines', function() {
 		it("base=" + base + " elts=" + elts, function() {
 			var opts = {'n':1,'b':base};
 			var gen = VDC(opts);
-			var data = fs.readFileSync('./test_files/' + x, 'utf-8').split("\n")
-			  .filter(function(x) { return x.length > 1; });
+			var data = fs.readFileSync('./test_files/' + x, 'utf-8').split("\n").filter(function(x) { return x.length > 1; });
 			for(var i = 1; i <= elts; ++i) assert.equal((i +"\t"+ gen.next().toFixed(6)).slice(0,-1),data[i-1].slice(0,-1));
 		});
 	});

@@ -1,35 +1,39 @@
-ifndef BASE
-BASE=2
-endif
+LIB=vdc
+REQS=
+ADDONS=
+AUXTARGETS=
 
-ifndef NELTS
-NELTS=10
-endif
-
-BASELINE=./test_files/baseline.$(BASE).$(NELTS)
-TESTFILE=./test_files/out.$(BASE).$(NELTS)
-
-.PHONY: test
-test: $(BASELINE)
-	node test_files/test_standalone.js $(BASE) $(NELTS) > $(TESTFILE)
-	diff $(BASELINE) $(TESTFILE)
-
-.PHONY: mocha
-mocha: $(BASELINE)
-	mocha -R spec
-
-.PHONY: baseline
-baseline $(BASELINE):
-	bash test_files/generate_baseline.sh $(BASE) $(NELTS) > $(BASELINE)
+ULIB=$(shell echo $(LIB) | tr a-z A-Z)
+DEPS=
+TARGET=$(LIB).js
 
 .PHONY: all
-all:
-	bash test_files/make.sh
+all: $(TARGET) $(AUXTARGETS)
+
+$(TARGET) $(AUXTARGETS): %.js : %.flow.js
+	node -e 'process.stdout.write(require("fs").readFileSync("$<","utf8").replace(/^\s*\/\*:[^*]*\*\/\s*(\n)?/gm,"").replace(/\/\*:[^*]*\*\//gm,""))' > $@
 
 .PHONY: clean
-clean:
-	rm -f test_files/out.*
+clean: clean-baseline
+	rm -f $(TARGET)
 
-.PHONY: clean-base
-clean-base: clean
-	rm -f test_files/baseline.*
+.PHONY: test mocha
+test mocha: test.js $(TARGET)
+	mocha -R spec -t 20000
+
+.PHONY: lint
+lint: $(TARGET) $(AUXTARGETS)
+	jshint --show-non-errors $(TARGET) $(AUXTARGETS)
+	jshint --show-non-errors package.json
+	jscs $(TARGET) $(AUXTARGETS)
+
+.PHONY: flow
+flow: lint
+	flow check --all --show-all-errors
+
+.PHONY: baseline clean-baseline
+baseline:
+	./misc/make_baseline.sh
+
+clean-baseline:
+	rm -f test_files/*.*

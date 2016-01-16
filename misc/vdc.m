@@ -14,10 +14,10 @@ d={argdigs,argdigs};
   http://reference.wolfram.com/mathematica/CUDALink/tutorial/Applications.html
 
   this function returns a table of the form
-  [iteration, fraction]   
+  [iteration, fraction]
 *)
 VanDerCorput[base_][len_]:=Table[
-  {n, With[{digits = Reverse@IntegerDigits[n, base]}, 
+  {n, With[{digits = Reverse@IntegerDigits[n, base]},
     N[Sum[argbase^(-ii)*digits[[ii]], {ii, Length[digits]}],d]]}, {n, len}];
 
 (* print table form *)

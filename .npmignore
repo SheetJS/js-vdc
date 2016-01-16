@@ -1,0 +1,10 @@
+node_modules
+misc/
+test_files/
+test.js
+.travis.yml
+.jscs.json
+.jshintrc
+.flowconfig
+.npmignore
+Makefile

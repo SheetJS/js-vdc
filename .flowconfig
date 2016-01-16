@@ -1,0 +1,17 @@
+[ignore]
+.*/node_modules/.*
+.*/dist/.*
+.*/test.js
+.*/vdc.js
+
+.*/bits/.*
+.*/ctest/.*
+.*/misc/.*
+.*/perf/.*
+
+[include]
+vdc.flow.js
+
+[libs]
+
+[options]
