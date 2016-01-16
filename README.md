@@ -57,4 +57,13 @@ claim that the original sequence definition started at `0`.
 
 ## License
 
-MIT-licensed.  See `LICENSE`
+Please consult the attached LICENSE file for details.  All rights not explicitly
+granted by the Apache 2.0 license are reserved by the Original Author.
+
+## Badges
+
+[![Build Status](https://travis-ci.org/SheetJS/js-vdc.svg?branch=master)](https://travis-ci.org/SheetJS/js-vdc)
+
+[![Coverage Status](http://img.shields.io/coveralls/SheetJS/js-vdc/master.svg)](https://coveralls.io/r/SheetJS/js-vdc?branch=master)
+
+[![Analytics](https://ga-beacon.appspot.com/UA-36810333-1/SheetJS/js-vdc?pixel)](https://github.com/SheetJS/js-vdc)
