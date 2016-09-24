@@ -4,13 +4,21 @@ Pure JS implementation of van der Corput low-discrepancy sequences.
 
 ## Installation
 
-Available on [npm vdc](http://npm.im/vdc):
+With [npm](http://npm.im/vdc):
 
-```
+```bash
 $ npm install vdc
 ```
 
-## Usage 
+In the browser:
+
+```html
+<script src="vdc.js"></script>
+```
+
+The browser exposes a variable `VDC`
+
+## Usage
 
 The exported function `VDC` accepts a `opts` object with the following fields:
 
@@ -19,15 +27,15 @@ The exported function `VDC` accepts a `opts` object with the following fields:
 
 Calling without arguments will default to the aforementioned values.
 
-The object returned by `VDC` exposes a `next()` method to get the next element. 
+The object returned by `VDC` exposes a `next()` method to get the next element.
 
 The field `last` holds the most recently generated value (accessing the field
 does not trigger a recalculation)
 
-## Sample Session
+For example:
 
-```
-var VDC = require('vdc')
+```js
+//var VDC = require('vdc') // uncomment this line if in node
 
 var opts = {'n':0, 'b':2};
 var generator = VDC(opts);
@@ -47,6 +55,21 @@ The expected output is
 0.875   (7/8)
 0.0625  (1/16)
 0.5625  (9/16)
+```
+
+## Testing
+
+`make test` will run the nodejs-based test.
+
+`make baseline` will generate the test baselines using Mathematica by explicitly
+extracting and reversing the digits.  The implementation is based off a tutorial
+<http://reference.wolfram.com/mathematica/CUDALink/tutorial/Applications.html>
+
+```mathematica
+VanDerCorput[base_][len_] := Table[
+  With[{digits = Reverse@IntegerDigits[n, base]},
+   Sum[2^(-ii)*digits[[ii]], {ii, Length[digits]}]
+   ], {n, len}]
 ```
 
 ## Notes

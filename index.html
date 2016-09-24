@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<!-- vdc.js (C) 2013-present SheetJS http://sheetjs.com -->
+<!-- vim: set ts=2: -->
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>VDC Live Demo</title>
+  </head>
+  <body>
+    <b>VDC Live Demo</b><br />
+    <a href="https://github.com/SheetJS/js-vdc">Source Code</a><br />
+    <a href="https://github.com/SheetJS/js-vdc/issues">Issues?  Something look weird?  Click here and report an issue</a><br />
+    <br />
+    <div>
+Using the van der Corput sequences for bases 2,3 we can generate a sequence of
+quasirandom points in the unit square.  The sequence is said to be
+<a href="https://en.wikipedia.org/wiki/Low-discrepancy_sequence">low-discrepancy</a>
+(basically the points are somewhat more uniformly spread across the square; you
+would expect a truly random sequence of points to have some concentrated lumps
+and small areas with no points).
+<br /><br />
+quasi-Monte Carlo methods generally have better error properties compared to the
+standard random and pseudo-random MC methods.  As a demonstration, we will
+estimate &#960; by sampling points in the unit square.  The left side shows the
+VDC estimate using bases 2 (x) and 3 (y).  The right side shows the random
+estimate by repeatedly calling Math.random.
+<br /><br />
+The graphs show the results of sampling many points and estimating PI.  Below
+the graphs, the PI value shows the calculated estimate, "err %" shows the
+relative error (smaller is better) and "ln err" shows the natural log of the
+error (smaller is better).
+<br /><br />
+VDC sequences can be "seeded" by setting the starting index for the calculation.
+In this demo a random integer is chosen using Math.random.
+<br /><br />
+The values and graphs are calculated in your browser window.  If the graphs do
+not appear or the values are not calculated, please report the issue!
+</div>
+    <br />
+    <div width=620>
+      <div style="float:left">
+        <b><center id="ltext">VDC (2,3) Sampling </center></b>
+        <br />
+        <canvas id="canvas1" width=300 height=300></canvas>
+        <br />
+        <b><center id="lout">Estimate of PI: </center></b>
+      </div>
+      <div style="float:right">
+        <b><center id="rtext">Math.random Sampling </center></b>
+        <br />
+        <canvas id="canvas2" width=300 height=300></canvas>
+        <br />
+        <b><center id="rout">Estimate of PI: </center></b>
+      </div>
+    </div>
+  </body>
+  <script src="http://d3js.org/d3.v2.js"></script>
+  <script src="vdc.js"></script>
+  <script src="https://cdn.rawgit.com/SheetJS/printj/master/printj.js"></script>
+  <script>
+    /*jshint browser:true */
+var PTS = 10000;
+var seed = (Math.random()*100000)|0;
+document.getElementById("ltext").innerHTML += PTS + " points; seed " + seed;
+document.getElementById("rtext").innerHTML += PTS + " points";
+var canvas1, canvas2;
+
+// from http://bl.ocks.org/syntagmatic/3341641 (WTFPL)
+var renderQueue = (function(func) {
+  var _queue = [],                  // data to be rendered
+      _rate = 1000,                 // number of calls per frame
+      _invalidate = function() {},  // invalidate last render queue
+      _clear = function() {};       // clearing function
+
+  var rq = function(data) {
+    if (data) rq.data(data);
+    _invalidate();
+    _clear();
+    rq.render();
+  };
+
+  rq.render = function() {
+    var valid = true;
+    _invalidate = rq.invalidate = function() {
+      valid = false;
+    };
+
+    function doFrame() {
+      if (!valid) return true;
+      var chunk = _queue.splice(0,_rate);
+      chunk.map(func);
+      timer_frame(doFrame);
+    }
+
+    doFrame();
+  };
+
+  rq.data = function(data) {
+    _invalidate();
+    _queue = data.slice(0);   // creates a copy of the data
+    return rq;
+  };
+
+  rq.add = function(data) {
+    _queue = _queue.concat(data);
+  };
+
+  rq.rate = function(value) {
+    if (!arguments.length) return _rate;
+    _rate = value;
+    return rq;
+  };
+
+  rq.remaining = function() {
+    return _queue.length;
+  };
+
+  // clear the canvas
+  rq.clear = function(func) {
+    if (!arguments.length) {
+      _clear();
+      return rq;
+    }
+    _clear = func;
+    return rq;
+  };
+
+  rq.invalidate = _invalidate;
+
+  var timer_frame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function(callback) { setTimeout(callback, 17); };
+
+  return rq;
+});
+
+// ---
+var color = d3.scale.linear()
+   .domain([0, 0.5, 1])
+      .range(["#ef2212", "#e7c767", "#2799df"])
+      .interpolate(d3.interpolateHcl);
+
+var VDC2 = VDC({b:2,n:seed});
+var VDC3 = VDC({b:3,n:seed});
+var VDC5 = VDC({b:5,n:seed});
+
+var in1 = 0, in2 = 0, out1 = 0, out2 = 0;
+
+function update1() {
+  var mypi = (in1 / (in1 + out1))*4, err = Math.abs(mypi - Math.PI)/Math.PI, lnerr = Math.log(err);
+  document.getElementById("lout").innerHTML = PRINTJ.sprintf("PI = %f <br />err%% = %f<br />ln err = %f", mypi, err, lnerr);
+}
+function update2() {
+  var mypi = (in2 / (in2 + out2))*4, err = Math.abs(mypi - Math.PI)/Math.PI, lnerr = Math.log(err);
+  document.getElementById("rout").innerHTML = PRINTJ.sprintf("PI = %f <br />err%% = %f<br />ln err = %f", mypi, err, lnerr);
+}
+
+function generate1(n) {
+  return d3.range(n).map(function(i) {
+    var x = VDC2.next(), y = VDC3.next();
+    if(x*x + y*y <= 1) in1++; else out1++;
+    if((in1 + out1) % 100 === 0) update1();
+    return [ canvas1.width*x, canvas1.height*y, color(VDC5.next()) ];
+  });
+}
+
+function generate2(n) {
+  return d3.range(n).map(function(i) {
+    var x = Math.random(), y = Math.random();
+    if(x*x + y*y <= 1) in2++; else out2++;
+    if((in2 + out2) % 100 === 0) update2();
+    return [ canvas2.width*x, canvas2.height*y, color(Math.random()) ];
+  });
+}
+
+function make_dot(ctx) {
+  return function(pos) {
+    ctx.fillStyle = pos[2];
+    ctx.beginPath();
+    ctx.fillRect(pos[0]-1,pos[1]-1,2,2);
+    ctx.stroke();
+    ctx.fill();
+  };
+}
+
+function make_clear_canvas(ctx, canvas) {
+  return function() { ctx.clearRect(0,0,canvas.width,canvas.height); make_boundary(canvas, ctx); };
+}
+
+function make_boundary(canvas, ctx) {
+  ctx.beginPath();
+  ctx.arc(0, canvas.height, canvas.width, 0, 2*Math.PI);
+  ctx.stroke();
+}
+
+window.onload = function() {
+canvas1 = document.getElementById("canvas1");
+var ctx1 = canvas1.getContext("2d");
+ctx1.globalCompositeOperation = "destination-over";
+
+canvas2 = document.getElementById("canvas2");
+var ctx2 = canvas2.getContext("2d");
+ctx2.globalCompositeOperation = "destination-over";
+
+make_boundary(canvas1, ctx1);
+make_boundary(canvas2, ctx2);
+
+var dot1 = make_dot(ctx1);
+var dot2 = make_dot(ctx2);
+
+var clear_canvas1 = make_clear_canvas(ctx1, canvas1);
+var clear_canvas2 = make_clear_canvas(ctx2, canvas2);
+
+
+var render1 = renderQueue(dot1).clear(clear_canvas1);
+var render2 = renderQueue(dot2).clear(clear_canvas2);
+
+render1(generate1(PTS));
+render2(generate2(PTS));
+};
+  </script>
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-36810333-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+</html>

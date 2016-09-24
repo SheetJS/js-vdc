@@ -1,6 +1,6 @@
 {
 	"name": "vdc",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"author": "SheetJS",
 	"description": "van der Corput low-discrepancy sequences",
 	"keywords": [ "math", "random", "qrng", "lds" ],
@@ -18,6 +18,11 @@
 	"repository": { "type":"git", "url":"git://github.com/SheetJS/js-vdc.git" },
 	"scripts": {
 		"test": "make test"
+	},
+	"config": {
+		"blanket": {
+			"pattern": "vdc.js"
+		}
 	},
 	"bugs": { "url": "https://github.com/SheetJS/js-vdc/issues" },
 	"license": "Apache-2.0",
